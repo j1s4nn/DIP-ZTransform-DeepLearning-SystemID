@@ -1,4 +1,148 @@
+# Deep Learning-Based System Identification Using Z-Transform Poles and Zeros
+
+**English** | [中文说明](#中文说明)
+
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+**Course:** Digital Image Processing · **Major:** Artificial Intelligence (NUIST) · **Author:** Hossen Md Jisan
+
+---
+
+## Project Overview
+
+This project proposes a deep learning framework for **discrete-time LTI system identification** using Z-transform pole-zero representations. Each system's pole-zero map is rendered as a 64×64 grayscale image and paired with a 128-dimensional frequency-response magnitude vector. Three neural architectures are designed and compared:
+
+- **PoleZeroCNN** — image-only CNN over the pole-zero map
+- **FreqMLP** — MLP over the frequency-response vector
+- **FusionNet** — late fusion of both modalities
+
+Systems are classified into five frequency-selective categories: **lowpass, highpass, bandpass, bandstop, and allpass**.
+
+The work bridges classical digital signal processing theory with modern deep learning and demonstrates that Z-transform pole-zero geometry is a rich, learnable representation for automated filter recognition — with direct applications to image denoising, blind deconvolution, and adaptive image restoration.
+
+## Results
+
+Trained on 5,000 balanced samples (1,000 per class) and evaluated on 750 held-out test samples:
+
+| Model | Accuracy | Precision | Recall | F1-Score | Parameters |
+|-------|----------|-----------|--------|----------|------------|
+| PoleZeroCNN | 99.73% | 99.76% | 99.73% | 99.74% | 421,861 |
+| FreqMLP | **100.00%** | 100.00% | 100.00% | 100.00% | 75,269 |
+| FusionNet | **100.00%** | 100.00% | 100.00% | 100.00% | 455,077 |
+
+All random seeds are fixed at 42; the full pipeline is reproducible end-to-end in ≈224 s on GPU.
+
+## Repository Structure
+
+```
+DIP_ZTransform_DL/
+├── src/
+│   ├── 01_dataset_generation.py      # Synthetic pole-zero dataset (5000 samples, 5 classes)
+│   ├── 02_dataset_visualization.py   # Dataset visualization (6 figures auto-saved)
+│   ├── 03_model.py                   # CNN, MLP, FusionNet model definitions
+│   ├── 04_train.py                   # Training loop, checkpoints, LR scheduling
+│   ├── 05_evaluate.py                # Test evaluation, confusion matrices, metrics
+│   └── 06_run_all.py                 # One-command full pipeline
+├── dataset/                          # Auto-populated on run
+├── output/
+│   ├── figures/                      # Training curves, confusion matrices, predictions (12 PNG)
+│   ├── dataset_viz/                  # Dataset visualizations (6 PNG)
+│   └── test_metrics/                 # Metrics CSV, JSON, comparison chart (1 PNG)
+├── paper/
+│   ├── main.tex                      # Complete LaTeX paper source (1257 lines)
+│   └── figures/                      # Paper figures directory (copy from output/)
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+## Setup
+
+Python 3.9 or higher recommended:
+
+```bash
+pip install -r requirements.txt
+```
+
+Core dependencies: PyTorch 2.0+, NumPy, SciPy, Matplotlib, scikit-learn, scikit-image, Pillow, pandas, seaborn, tqdm.
+
+## How to Run
+
+```bash
+# Option 1: One-command full pipeline (recommended)
+python src/06_run_all.py
+
+# Option 2: Step by step
+python src/01_dataset_generation.py   # ~96s on CPU
+python src/02_dataset_visualization.py
+python src/03_model.py                # Architecture verification
+python src/04_train.py                # ~110s on GPU
+python src/05_evaluate.py
+```
+
+## Output Files (19 PNG total)
+
+**output/dataset_viz/** (6 figures)
+- fig01_sample_pz_maps.png — Sample pole-zero map images per class
+- fig02_mean_freq_response.png — Mean frequency response per class
+- fig03_class_distribution.png — Class balance bar chart
+- fig04_freq_response_heatmap.png — Frequency response heatmap
+- fig05_pixel_distribution.png — Pixel intensity distributions
+- fig06_pz_scatter.png — Pole-zero scatter on Z-plane
+
+**output/figures/** (12 figures)
+- fig_train_curves_{cnn,mlp,fusion}.png — Training and validation curves
+- fig_confusion_{cnn,mlp,fusion}.png — Normalized confusion matrices
+- fig_f1_per_class_{cnn,mlp,fusion}.png — Per-class F1 score bar charts
+- fig_pz_predictions_{cnn,mlp,fusion}.png — Prediction panels (GT vs predicted)
+
+**output/test_metrics/** (1 figure)
+- fig_model_comparison.png — Side-by-side model comparison
+
+## Paper Compilation
+
+`paper/main.tex` contains the complete LaTeX source (1,257 lines):
+
+- Abstract (with quantitative results)
+- Introduction (background, problem statement, research objectives)
+- Related Work (classical system ID, deep learning for signals, multi-modal fusion — references 2015–2022)
+- Dataset Construction (Z-transform theory, conjugate pair generation, class placement rules, two feature representations)
+- Model Architectures (shared ConvBlock derivation; PoleZeroCNN and FreqMLP layer tables with forward-pass equations; FusionNet TikZ diagram and mathematical forward pass; label smoothing, Adam, cosine annealing)
+- Experiments and Discussion (all 19 figures, 5 data tables, error analysis, relevance to image processing)
+- Conclusion and Future Work
+- References (18 references, 2015–2022)
+
+To compile:
+
+```bash
+# Step 1: Copy figures into paper directory
+mkdir -p paper/figures
+cp output/dataset_viz/*.png paper/figures/
+cp output/figures/*.png paper/figures/
+cp output/test_metrics/fig_model_comparison.png paper/figures/
+
+# Step 2: Compile (run twice for correct cross-references)
+cd paper
+pdflatex main.tex
+pdflatex main.tex
+```
+
+## Notes
+
+- The `.npz` and `.pt` files in `dataset/` are excluded from git via `.gitignore`; they are regenerated automatically by running the pipeline.
+- The code falls back to CPU automatically if no GPU is available.
+- All random seeds are fixed at 42 for full reproducibility.
+- Figure paths in the LaTeX source are relative to `paper/figures/`; the copy step above must be completed before compilation.
+
+---
+
+<a id="中文说明"></a>
+
 # 基于Z变换极点与零点的深度学习系统辨识
+
+[English](#deep-learning-based-system-identification-using-z-transform-poles-and-zeros) | **中文说明**
 
 **课程名称：** 数字图像处理
 **专业：** 人工智能
@@ -149,151 +293,3 @@ pdflatex main.tex
 - 若无GPU，代码自动回退到CPU，训练时间相应增加。
 - 所有随机种子固定为42，确保完全可复现。
 - 论文图像引用路径为 figures/，编译前必须先执行上述复制命令。
-
----
-
----
-
-# Deep Learning-Based System Identification Using Z-Transform Poles and Zeros
-
-**Course:** Digital Image Processing
-**Major:** Artificial Intelligence
-**Name:** Hossen Md Jisan
-**Student ID:** 202353460019
-**Topic:** Deep Learning-Based System Identification Using Z-Transform Poles and Zeros
-
----
-
-## Project Overview
-
-In this project, I propose a deep learning framework for discrete-time LTI system identification using Z-transform pole-zero representations. I render each system's pole-zero map as a 64x64 grayscale image and additionally extract a 128-dimensional frequency-response magnitude vector. I design and compare three neural architectures: PoleZeroCNN (image-only CNN), FreqMLP (frequency-vector MLP), and FusionNet (late-fusion of both modalities). Systems are classified into five frequency-selective categories: lowpass, highpass, bandpass, bandstop, and allpass.
-
-This work bridges classical digital signal processing theory with modern deep learning and demonstrates that Z-transform pole-zero geometry is a rich, learnable representation for automated filter recognition, with direct applications to image denoising, blind deconvolution, and adaptive image restoration.
-
----
-
-## Results Summary
-
-Trained on 5,000 balanced samples (1,000 per class) and evaluated on 750 held-out test samples:
-
-| Model | Accuracy | Precision | Recall | F1-Score | Parameters |
-|-------|----------|-----------|--------|----------|------------|
-| PoleZeroCNN | 99.73% | 99.76% | 99.73% | 99.74% | 421,861 |
-| FreqMLP | 100.00% | 100.00% | 100.00% | 100.00% | 75,269 |
-| FusionNet | 100.00% | 100.00% | 100.00% | 100.00% | 455,077 |
-
----
-
-## Repository Structure
-
-```
-DIP_ZTransform_DL/
-├── src/
-│   ├── 01_dataset_generation.py      # Synthetic pole-zero dataset (5000 samples, 5 classes)
-│   ├── 02_dataset_visualization.py   # Dataset visualization (6 figures auto-saved)
-│   ├── 03_model.py                   # CNN, MLP, FusionNet model definitions
-│   ├── 04_train.py                   # Training loop, checkpoints, LR scheduling
-│   ├── 05_evaluate.py                # Test evaluation, confusion matrices, metrics
-│   └── 06_run_all.py                 # One-command full pipeline
-├── dataset/                          # Auto-populated on run
-├── output/
-│   ├── figures/                      # Training curves, confusion matrices, predictions (12 PNG)
-│   ├── dataset_viz/                  # Dataset visualizations (6 PNG)
-│   └── test_metrics/                 # Metrics CSV, JSON, comparison chart (1 PNG)
-├── paper/
-│   ├── main.tex                      # Complete LaTeX paper source (1257 lines)
-│   └── figures/                      # Paper figures directory (copy from output/)
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
----
-
-## Setup
-
-Python 3.9 or higher recommended:
-
-```bash
-pip install -r requirements.txt
-```
-
-Core dependencies: PyTorch 2.0+, NumPy, SciPy, Matplotlib, scikit-learn, scikit-image, Pillow, pandas, seaborn, tqdm.
-
----
-
-## How to Run
-
-```bash
-# Option 1: One-command full pipeline (recommended)
-python src/06_run_all.py
-
-# Option 2: Step by step
-python src/01_dataset_generation.py   # ~96s on CPU
-python src/02_dataset_visualization.py
-python src/03_model.py                # Architecture verification
-python src/04_train.py                # ~110s on GPU
-python src/05_evaluate.py
-```
-
-Full pipeline completes in approximately 224 seconds on GPU.
-
----
-
-## Output Files (19 PNG total)
-
-**output/dataset_viz/** (6 figures)
-- fig01_sample_pz_maps.png - Sample pole-zero map images per class
-- fig02_mean_freq_response.png - Mean frequency response per class
-- fig03_class_distribution.png - Class balance bar chart
-- fig04_freq_response_heatmap.png - Frequency response heatmap
-- fig05_pixel_distribution.png - Pixel intensity distributions
-- fig06_pz_scatter.png - Pole-zero scatter on Z-plane
-
-**output/figures/** (12 figures)
-- fig_train_curves_{cnn,mlp,fusion}.png - Training and validation curves
-- fig_confusion_{cnn,mlp,fusion}.png - Normalized confusion matrices
-- fig_f1_per_class_{cnn,mlp,fusion}.png - Per-class F1 score bar charts
-- fig_pz_predictions_{cnn,mlp,fusion}.png - Prediction panels (GT vs predicted)
-
-**output/test_metrics/** (1 figure)
-- fig_model_comparison.png - Side-by-side model comparison
-
----
-
-## Paper Compilation
-
-The file paper/main.tex contains the complete LaTeX source (1,257 lines) structured per course requirements:
-
-- Abstract (with quantitative results)
-- Introduction (background, problem statement, research objectives, paper organization)
-- Related Work (classical system ID, deep learning for signals, multi-modal fusion, image quality assessment - all references 2015-2022)
-- Dataset Construction (Z-transform theory, conjugate pair generation, class placement rules with worked examples, Algorithm box, two feature representations)
-- Model Architectures (shared ConvBlock derivation; PoleZeroCNN with layer table and full forward-pass equations; FreqMLP with layer table and forward-pass; FusionNet with TikZ architecture diagram, mathematical forward pass, and parameter table; training objective with label smoothing; Adam optimizer and cosine annealing equations)
-- Experiments and Discussion (all 19 PNG figures, 5 data tables, quantitative analysis, lowpass-allpass confusion explanation, PSNR/SSIM interpretation, relevance to image processing)
-- Conclusion and Future Work
-- References (18 references, 2015-2022)
-
-To compile:
-
-```bash
-# Step 1: Copy figures into paper directory
-mkdir -p paper/figures
-cp output/dataset_viz/*.png paper/figures/
-cp output/figures/*.png paper/figures/
-cp output/test_metrics/fig_model_comparison.png paper/figures/
-
-# Step 2: Compile (run twice for correct cross-references)
-cd paper
-pdflatex main.tex
-pdflatex main.tex
-```
-
----
-
-## Notes
-
-- The .npz and .pt files in dataset/ are excluded from git via .gitignore due to their size. They are regenerated automatically by running the pipeline.
-- The code falls back to CPU automatically if no GPU is available.
-- All random seeds are fixed at 42 for full reproducibility.
-- Figure paths in the LaTeX source are relative to paper/figures/. The copy step above must be completed before compilation.
