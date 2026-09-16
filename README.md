@@ -22,6 +22,17 @@ Systems are classified into five frequency-selective categories: **lowpass, high
 
 The work bridges classical digital signal processing theory with modern deep learning and demonstrates that Z-transform pole-zero geometry is a rich, learnable representation for automated filter recognition — with direct applications to image denoising, blind deconvolution, and adaptive image restoration.
 
+## Motivation
+
+Classical discrete-time system identification relies on hand-derived pole-zero
+analysis and frequency-response inspection — exact, but manual and hard to
+automate at scale. This project asks whether a filter's *identity* (lowpass,
+highpass, bandpass, bandstop, allpass) can instead be learned directly from its
+Z-transform geometry, treating the pole-zero map as an image and the frequency
+response as a vector. It is a small, controlled test of whether deep networks
+can read classical DSP representations, with downstream relevance to image
+denoising, blind deconvolution, and adaptive restoration.
+
 ## Results
 
 Trained on 5,000 balanced samples (1,000 per class) and evaluated on 750 held-out test samples:
@@ -135,6 +146,13 @@ pdflatex main.tex
 - The code falls back to CPU automatically if no GPU is available.
 - All random seeds are fixed at 42 for full reproducibility.
 - Figure paths in the LaTeX source are relative to `paper/figures/`; the copy step above must be completed before compilation.
+
+## Future Improvements
+
+- Extend beyond five canonical classes to continuous filter-parameter regression (e.g., predicting cutoff frequency and filter order)
+- Test robustness to noisy or incomplete frequency-response vectors, closer to real identification conditions
+- Add a held-out generalization split over unseen pole-zero configurations rather than random samples of the same generator
+- Apply the trained models to a downstream image-restoration task (selecting a filter from a degraded image) to demonstrate the stated applications
 
 ---
 
